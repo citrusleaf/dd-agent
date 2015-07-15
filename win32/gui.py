@@ -79,8 +79,8 @@ from config import (
     get_version
 )
 from util import yLoader
+from utils.flare import Flare
 from utils.platform import Platform
-
 
 # Constants describing the agent state
 AGENT_RUNNING = 0
@@ -550,6 +550,7 @@ class Menu(QMenu):
     START = "Start"
     STOP = "Stop"
     RESTART = "Restart"
+    FLARE = "Flare"
     MAC_LOGIN = '{0} at login'
     EXIT = "Exit"
     SYSTEM_EVENTS_CMD = 'tell application "System Events" to {0}'
@@ -573,6 +574,8 @@ class Menu(QMenu):
         if Platform.is_mac():
             self.add_option(self.MAC_LOGIN.format(self.enable_or_disable_mac()),
                             lambda: self.enable_or_disable_login())
+        elif Platform.is_windows():
+            self.add_option(self.FLARE, lambda: windows_flare())
 
         # And finally the exit
         self.add_option(self.EXIT, lambda: sys.exit(0))
@@ -748,6 +751,25 @@ def agent_manager(action, async=True):
         manager(action)
     else:
         thread.start_new_thread(manager, (action,))
+
+
+def windows_flare():
+    case_id, ok = QInputDialog.getInteger(
+        None, "Flare",
+        "Your logs and configuration files are going to be collected and "
+        "sent to Datadog Support. Please enter your ticket number if you have one:",
+        value=0, minValue=0
+    )
+    case_id = int(case_id) if ok else None
+    f = Flare(True, case_id)
+    info_popup("Logs and configurations files are being collected")
+    f.collect()
+    try:
+        case_id = f.upload()
+        info_popup("Your logs were successfully uploaded. For future reference,"
+                   " your internal case id is {0}".format(case_id))
+    except Exception, e:
+        warning_popup('The upload failed:\n{0}'.format(str(e)))
 
 
 def warning_popup(message, parent=None):

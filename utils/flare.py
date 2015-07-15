@@ -162,6 +162,7 @@ class Flare(object):
         self._resp = requests.post(url, files=files, data=data,
                                    timeout=self.TIMEOUT)
         self._analyse_result()
+        return self._case_id
 
     # Start by creating the tar file which will contain everything
     def _init_tarfile(self):
