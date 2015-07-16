@@ -754,12 +754,11 @@ def agent_manager(action, async=True):
 
 
 def windows_flare():
-    info_popup("Starting flare")
     case_id, ok = QInputDialog.getInteger(
         None, "Flare",
         "Your logs and configuration files are going to be collected and "
         "sent to Datadog Support. Please enter your ticket number if you have one:",
-        value=0, minValue=0
+        value=0, min=0
     )
     if not ok:
         info_popup("Flare cancelled")
