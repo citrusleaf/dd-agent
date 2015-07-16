@@ -362,8 +362,8 @@ class Flare(object):
     # Add output of the command to the tarfile
     def _add_command_output_tar(self, name, command, command_desc=None):
         out, err, _ = self._capture_output(command, print_exc_to_stderr=False)
-        _, temp_path = tempfile.mkstemp(prefix='dd')
-        with open(temp_path, 'w') as temp_file:
+        fh, temp_path = tempfile.mkstemp(prefix='dd')
+        with os.fdopen(fh) as temp_file:
             if command_desc:
                 temp_file.write(">>>> CMD <<<<\n")
                 temp_file.write(command_desc)
