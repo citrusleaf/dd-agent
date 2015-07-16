@@ -140,13 +140,14 @@ class Flare(object):
         self._tar.close()
 
     # Upload the tar file
-    def upload(self):
+    def upload(self, email=None):
         self._check_size()
 
         if self._cmdline:
             self._ask_for_confirmation()
 
-        email = self._ask_for_email()
+        if not email:
+            email = self._ask_for_email()
 
         log.info("Uploading {0} to Datadog Support".format(self._tar_path))
         url = self._url

@@ -754,18 +754,29 @@ def agent_manager(action, async=True):
 
 
 def windows_flare():
+    info_popup("Starting flare")
     case_id, ok = QInputDialog.getInteger(
         None, "Flare",
         "Your logs and configuration files are going to be collected and "
         "sent to Datadog Support. Please enter your ticket number if you have one:",
         value=0, minValue=0
     )
-    case_id = int(case_id) if ok else None
+    if not ok:
+        info_popup("Flare cancelled")
+        return
+    case_id = int(case_id)
     f = Flare(True, case_id)
-    info_popup("Logs and configurations files are being collected")
     f.collect()
+    email, ok = QInputDialog.getText(
+        None, "Your email",
+        "Logs and configuration files have been collected"
+        " Please enter your email address:"
+    )
+    if not ok:
+        info_popup("Flare cancelled")
+        return
     try:
-        case_id = f.upload()
+        case_id = f.upload(email=str(email))
         info_popup("Your logs were successfully uploaded. For future reference,"
                    " your internal case id is {0}".format(case_id))
     except Exception, e:
